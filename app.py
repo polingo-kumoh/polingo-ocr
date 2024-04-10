@@ -19,14 +19,14 @@ def image_to_text():
 
     # 파일 확장자 검증
     _, file_extension = os.path.splitext(file.filename)
-    if file_extension.lower() != '.png':
-        return jsonify({"error": "Invalid file type. Only PDF files are allowed."}), 400
+    if file_extension.lower() not in ['.png', '.jpg', '.jpeg', '.gif']:
+        return jsonify({"error": "Invalid file type. Only image files (PNG, JPG, JPEG, GIF) are allowed."}), 400
 
     # 파일을 스트림으로 읽기
     extracted_texts = " ".join(ocr_model.process_image(file.read()))
 
 
-    # 예시 응답
+    # 응답
     return jsonify({"data": extracted_texts}), 200
 
 if __name__ == '__main__':
