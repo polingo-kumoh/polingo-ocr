@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    image: polingo-ocr
+    networks:
+      polingo:
+        ipv4_address: 172.22.0.2
+    build : .
+    container_name : polingo-ocr
+    ports:
+      - "5001:5000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+    volumes:
+      - ./app.py:/app/app.py
+      - ./ocr.py:/app/ocr.py
+networks:
+  polingo:
+    external: true
+    name: polingo

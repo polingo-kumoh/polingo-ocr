@@ -7,7 +7,7 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 5MB 제한
 
 ocr_model = OCRProcessor()
 
-@app.route('/api/to-text', methods=['POST'])
+@app.route('/api/ocr/v1/to-text', methods=['POST'])
 def image_to_text():
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
