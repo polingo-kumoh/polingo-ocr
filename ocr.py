@@ -1,37 +1,25 @@
 import easyocr
+from PIL import Image
+import io
 import numpy as np
-import cv2
-import random
-import matplotlib.pyplot as plt
-from PIL import ImageFont, ImageDraw, Image
 
-font_path = "C:/Windows/Fonts/NanumGothic.ttf"
-font_size = 15
+class OCRProcessor:
+    def __init__(self, language_code, font_path="NanumGothic-Regular.ttf", font_size=15):
+        self.font_path = font_path
+        self.font_size = font_size
+        # 여기서 GPU 사용 여부를 설정할 수 있습니다. 시스템에 따라 False로 설정할 필요가 있을 수 있습니다.
+        self.reader = easyocr.Reader([language_code], gpu=True)
 
-reader = easyocr.Reader(['ja', 'en'], gpu = True) #ja, ko, en
-result = reader.readtext('hi.jpg')
-img    = cv2.imread('hi.jpg')
-img = Image.fromarray(img)
+    def process_image(self, image_bytes):
 
-font = ImageFont.truetype(font_path, font_size)
-draw = ImageDraw.Draw(img)
-np.random.seed(42)
-COLORS = np.random.randint(0, 255, size=(256, 3),dtype="uint8")
+        # 이미지에서 텍스트 추출
+        image = Image.open(io.BytesIO(image_bytes))
+        np_image = np.array(image)
+        result = self.reader.readtext(np_image)
 
-for i in result :
-    x = i[0][0][0] 
-    y = i[0][0][1] 
-    w = i[0][1][0] - i[0][0][0] 
-    h = i[0][2][1] - i[0][1][1]
 
-    color_idx = random.randint(0,255)
-    color = [int(c) for c in COLORS[color_idx]]
+        # 추출된 텍스트만을 리스트로 컴파일
+        extracted_texts = [text[1] for text in result]
 
-    draw.rectangle(((x, y), (x+w, y+h)), outline=tuple(color), width=2)
-    draw.text((int((x + x + w) / 2) , y-2),str(i[1]), font=font, fill=tuple(color),)
-    #draw.text((int((x + x + w) / 2) , y-2), str(i[1]).encode('utf-8'), font=font, fill=tuple(color),)
-    print(f"{i[1]}",end="")
+        return extracted_texts
 
-plt.figure(figsize=(50,50))
-plt.imshow(img)
-plt.show()
